@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Замовлення: {{ tovar.nazva }}</h1>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  {{ form.quantity.label }} {{ form.quantity() }}<br>
+  {{ form.submit() }}
+</form>
+{% endblock %}
