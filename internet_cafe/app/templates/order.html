@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Замовлення: {{ tovar.nazva }}{% endblock %}
+
+{% block content %}
+<h1>Замовити: {{ tovar.nazva }}</h1>
+<p>Ціна: {{ tovar.tsina }} грн</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <label for="name">{{ form.name.label }}</label>
+    {{ form.name() }}
+
+    <label for="phone">{{ form.phone.label }}</label>
+    {{ form.phone() }}
+
+    <label for="quantity">{{ form.quantity.label }}</label>
+    {{ form.quantity(min=1) }}
+
+    {{ form.submit() }}
+</form>
+{% endblock %}

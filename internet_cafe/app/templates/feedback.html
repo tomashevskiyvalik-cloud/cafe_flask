@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Відгуки - Кафе{% endblock %}
+
+{% block content %}
+<h1>Відгуки</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <label for="name">{{ form.name.label }}</label>
+    {{ form.name() }}
+
+    <label for="email">{{ form.email.label }}</label>
+    {{ form.email() }}
+
+    <label for="message">{{ form.message.label }}</label>
+    {{ form.message() }}
+
+    {{ form.submit() }}
+</form>
+
+<hr />
+
+{% for fb in feedbacks %}
+<div class="feedback-item">
+    <p><strong>{{ fb.name }}</strong> ({{ fb.email }})</p>
+    <p>{{ fb.message }}</p>
+    <p><small>{{ fb.created_at.strftime('%d-%m-%Y %H:%M') }}</small></p>
+</div>
+{% else %}
+<p>Відгуків поки немає.</p>
+{% endfor %}
+
+{% endblock %}

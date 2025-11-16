@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Товари</h2>
+
+    <a href="/admin/tovary/add" class="btn coffee-btn mb-3">Додати товар</a>
+
+    <table class="table table-striped coffee-table">
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>Опис</th>
+            <th>Ціна</th>
+            <th></th>
+        </tr>
+
+        {% for t in tovary %}
+        <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.nazva }}</td>
+            <td>{{ t.opis }}</td>
+            <td>{{ t.tsina }}</td>
+            <td>
+                <a href="/admin/tovary/{{ t.id }}/delete" class="btn btn-danger btn-sm">X</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

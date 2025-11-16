@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Редагувати відгук</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Ім'я</label>
+            <input class="form-control" name="imya" value="{{ fb.imya }}">
+        </div>
+        <div class="mb-3">
+            <label>Текст</label>
+            <textarea class="form-control" name="text">{{ fb.text }}</textarea>
+        </div>
+        <button class="btn btn-success">Зберегти</button>
+        <a href="{{ url_for('main.admin_panel') }}" class="btn btn-secondary">Назад</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Редагувати страву - Адмінка{% endblock %}
+
+{% block content %}
+<h1>Редагувати страву</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <label for="nazva">{{ form.nazva.label }}</label>
+    {{ form.nazva() }}
+
+    <label for="opis">{{ form.opis.label }}</label>
+    {{ form.opis() }}
+
+    <label for="tsina">{{ form.tsina.label }}</label>
+    {{ form.tsina() }}
+
+    {{ form.submit() }}
+</form>
+{% endblock %}
