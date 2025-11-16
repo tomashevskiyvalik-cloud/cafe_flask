@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Адмінка - Кафе{% endblock %}
+
+{% block content %}
+<h1>Адмінка</h1>
+
+<h2>Меню</h2>
+<a href="{{ url_for('admin.add_tovar') }}"><button>Додати страву</button></a>
+<div class="tovar-list">
+    {% for tovar in tovary %}
+    <div class="tovar-card">
+        <h3>{{ tovar.nazva }}</h3>
+        <p>{{ tovar.opis }}</p>
+        <p>Ціна: {{ tovar.tsina }} грн</p>
+        <div class="flex" style="gap:0.5rem;">
+            <a href="{{ url_for('admin.edit_tovar', id=tovar.id) }}"><button>Редагувати</button></a>
+            <form action="{{ url_for('admin.delete_tovar', id=tovar.id) }}" method="POST" style="display:inline;">
+                <button type="submit" onclick="return confirm('Видалити цю страву?');">Видалити</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p>Меню порожнє.</p>
+    {% endfor %}
+</div>
+
+<hr />
+
+<h2>Відгуки</h2>
+{% for fb in feedbacks %}
+<div class="feedback-item">
+    <p><strong>{{ fb.name }}</strong> ({{ fb.email }})</p>
+    <p>{{ fb.message }}</p>
+    <p><small>{{ fb.created_at.strftime('%d-%m-%Y %H:%M') }}</small></p>
+    <form action="{{ url_for('admin.delete_feedback', id=fb.id) }}" method="POST" style="display:inline;">
+        <button type="submit" onclick="return confirm('Видалити цей відгук?');">Видалити</button>
+    </form>
+</div>
+{% else %}
+<p>Відгуків немає.</p>
+{% endfor %}
+<hr />
+
+<h2>Замовлення</h2>
+{% for order in orders %}
+<div class="feedback-item">
+    <p><strong>{{ order.name }}</strong>, Телефон: {{ order.phone }}</p>
+    <p>Страва: {{ order.tovar.nazva }}, Кількість: {{ order.quantity }}</p>
+    <p><small>{{ order.created_at.strftime('%d-%m-%Y %H:%M') }}</small></p>
+    <form action="{{ url_for('admin.delete_order', id=order.id) }}" method="POST" style="display:inline;">
+        <button type="submit" onclick="return confirm('Видалити це замовлення?');">Видалити</button>
+    </form>
+</div>
+{% else %}
+<p>Замовлень немає.</p>
+{% endfor %}
+{% endblock %}
