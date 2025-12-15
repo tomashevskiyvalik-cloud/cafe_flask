@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}API — Кафе{% endblock %}
+
+{% block content %}
+<h1>📡 REST API</h1>
+
+<p>Нижче наведено посилання на основні API endpoints. Клікніть, щоб відкрити JSON у новій вкладці.</p>
+
+<div class="api-container">
+    <a href="{{ url_for('api.get_tovars') }}" target="_blank" class="api-btn">📦 Tovars (GET)</a>
+    <a href="{{ url_for('api.get_orders') }}" target="_blank" class="api-btn">📑 Orders (GET)</a>
+    <a href="{{ url_for('api.get_feedbacks') }}" target="_blank" class="api-btn">💬 Feedbacks (GET)</a>
+</div>
+
+<p>Для POST/PUT/DELETE використовуйте Postman або curl.</p>
+{% endblock %}

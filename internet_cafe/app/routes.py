@@ -42,3 +42,8 @@ def order(tovar_id):
         flash(f'Ваше замовлення на {tovar.nazva} прийнято!', 'success')
         return redirect(url_for('main.menu'))
     return render_template('order.html', form=form, tovar=tovar)
+
+# ---------- НОВИЙ МАРШРУТ API СТОРІНКИ ----------
+@main_bp.route('/api-page')
+def api_page():
+    return render_template('api_page.html')

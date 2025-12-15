@@ -1,11 +1,21 @@
 from . import db
 from datetime import datetime
 
+
 class Tovar(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nazva = db.Column(db.String(150), nullable=False)
     opis = db.Column(db.Text, nullable=False)
     tsina = db.Column(db.Float, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nazva": self.nazva,
+            "opis": self.opis,
+            "tsina": self.tsina
+        }
+
 
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,6 +23,16 @@ class Feedback(db.Model):
     email = db.Column(db.String(120), nullable=False)
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "message": self.message,
+            "created_at": self.created_at.isoformat()
+        }
+
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,3 +43,14 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     tovar = db.relationship('Tovar', backref=db.backref('orders', lazy=True))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "tovar_id": self.tovar_id,
+            "tovar_nazva": self.tovar.nazva,
+            "quantity": self.quantity,
+            "name": self.name,
+            "phone": self.phone,
+            "created_at": self.created_at.isoformat()
+        }

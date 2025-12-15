@@ -12,6 +12,8 @@
         <a href="{{ url_for('main.menu') }}">Меню</a>
         <a href="{{ url_for('main.feedback') }}">Відгуки</a>
         <a href="{{ url_for('admin.admin_index') }}">Адмінка</a>
+        <!-- КНОПКА API ДОДАНА -->
+        <a href="{{ url_for('main.api_page') }}">API Стр.</a>
     </nav>
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}

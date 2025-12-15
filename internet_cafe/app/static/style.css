@@ -104,3 +104,26 @@ form textarea {
         gap: 1rem;
     }
 }
+
+/* Сторінка API */
+.api-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.api-btn {
+    background: #222;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.api-btn:hover {
+    background: #555;
+}
