@@ -8,12 +8,16 @@ class Tovar(db.Model):
     opis = db.Column(db.Text, nullable=False)
     tsina = db.Column(db.Float, nullable=False)
 
+    # ✅ НОВЕ ПОЛЕ ДЛЯ ФОТО (назва файлу в static/uploads/tovary/)
+    image_filename = db.Column(db.String(255), nullable=True)
+
     def to_dict(self):
         return {
             "id": self.id,
             "nazva": self.nazva,
             "opis": self.opis,
-            "tsina": self.tsina
+            "tsina": self.tsina,
+            "image_filename": self.image_filename
         }
 
 

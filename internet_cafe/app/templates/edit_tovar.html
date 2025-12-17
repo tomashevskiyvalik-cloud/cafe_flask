@@ -4,17 +4,40 @@
 
 {% block content %}
 <h1>Редагувати страву</h1>
-<form method="POST">
+
+<form method="POST" enctype="multipart/form-data" class="form">
     {{ form.hidden_tag() }}
-    <label for="nazva">{{ form.nazva.label }}</label>
+
+    <label>{{ form.nazva.label }}</label>
     {{ form.nazva() }}
 
-    <label for="opis">{{ form.opis.label }}</label>
+    <label>{{ form.opis.label }}</label>
     {{ form.opis() }}
 
-    <label for="tsina">{{ form.tsina.label }}</label>
+    <label>{{ form.tsina.label }}</label>
     {{ form.tsina() }}
 
-    {{ form.submit() }}
+    {% if tovar is defined and tovar.image_filename %}
+      <div style="margin-top:12px;">
+        <div style="font-weight:800; margin-bottom:6px;">Поточне фото:</div>
+        <img
+          src="{{ url_for('static', filename='uploads/tovary/' ~ tovar.image_filename) }}"
+          alt="Фото {{ tovar.nazva }}"
+          style="max-width:320px; width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.14);"
+        >
+      </div>
+    {% endif %}
+
+    {% if form.photo is defined %}
+      <label style="margin-top:12px;">Нове фото (необовʼязково)</label>
+      {{ form.photo() }}
+      <p style="margin:6px 0 0; font-size:12px; color: rgba(255,255,255,.65);">
+        Якщо вибереш нове фото — воно замінить старе.
+      </p>
+    {% endif %}
+
+    <div style="margin-top:12px;">
+      {{ form.submit() }}
+    </div>
 </form>
 {% endblock %}

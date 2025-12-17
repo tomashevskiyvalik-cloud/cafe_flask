@@ -4,18 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Кафе{% endblock %}</title>
+
+    <!-- Твій старий CSS лишається -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+    <!-- НОВА ТЕМА (глобальний красивий дизайн) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('main.index') }}">Головна</a>
-        <a href="{{ url_for('main.menu') }}">Меню</a>
-        <a href="{{ url_for('main.feedback') }}">Відгуки</a>
-        <a href="{{ url_for('admin.admin_index') }}">Адмінка</a>
-        <!-- КНОПКА API ДОДАНА -->
-        <a href="{{ url_for('main.api_page') }}">API Стр.</a>
+
+    <nav class="topnav topnav-center">
+        <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
+        <div class="navlinks navlinks-center" id="navlinks">
+            <a class="navlink" href="{{ url_for('main.index') }}">Головна</a>
+            <a class="navlink" href="{{ url_for('main.menu') }}">Меню</a>
+            <a class="navlink" href="{{ url_for('main.feedback') }}">Відгуки</a>
+            <a class="navlink" href="{{ url_for('admin.admin_index') }}">Адмінка</a>
+            <a class="navlink navlink-accent" href="{{ url_for('main.api_page') }}">API</a>
+        </div>
     </nav>
-    <div class="container">
+
+    <div class="container page-card">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -23,7 +35,10 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
         {% block content %}{% endblock %}
     </div>
+
+    <script defer src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>

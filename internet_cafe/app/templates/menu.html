@@ -3,17 +3,46 @@
 {% block title %}Меню - Кафе{% endblock %}
 
 {% block content %}
-<h1>Меню</h1>
-<div class="tovar-list">
-    {% for tovar in tovary %}
-    <div class="tovar-card">
-        <h2>{{ tovar.nazva }}</h2>
-        <p>{{ tovar.opis }}</p>
-        <p><strong>Ціна:</strong> {{ tovar.tsina }} грн</p>
-        <a href="{{ url_for('main.order', tovar_id=tovar.id) }}"><button>Замовити</button></a>
+<div class="menu-head">
+  <div>
+    <h1 class="menu-title">Меню</h1>
+    <p class="menu-sub">Обери щось смачне — і замовляй прямо на сайті 🙂</p>
+  </div>
+</div>
+
+<div class="menu-grid">
+  {% for tovar in tovary %}
+    {% set img = tovar|attr('image_filename') %}
+    <div class="menu-card">
+      <div class="menu-media">
+        {% if img %}
+          <img src="{{ url_for('static', filename='uploads/tovary/' ~ img) }}" alt="{{ tovar.nazva }}">
+        {% else %}
+          <div class="menu-placeholder" aria-hidden="true">
+            <div class="ph-icon">☕</div>
+            <div class="ph-text">Фото немає</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="menu-body">
+        <div class="menu-row">
+          <h2 class="menu-name">{{ tovar.nazva }}</h2>
+          <div class="menu-price">{{ tovar.tsina }} грн</div>
+        </div>
+
+        <p class="menu-desc">{{ tovar.opis }}</p>
+
+        <div class="menu-actions">
+          <a class="menu-btn" href="{{ url_for('main.order', tovar_id=tovar.id) }}">🛒 Замовити</a>
+        </div>
+      </div>
     </div>
-    {% else %}
-    <p>Меню поки що порожнє.</p>
-    {% endfor %}
+  {% else %}
+    <div class="menu-empty">
+      <div class="menu-empty__title">Меню поки що порожнє.</div>
+      <div class="menu-empty__text">Зайди в адмінку і додай перші страви ✨</div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}
