@@ -14,4 +14,115 @@
 </div>
 
 <p>Для POST/PUT/DELETE використовуйте Postman або curl.</p>
+
+<hr>
+
+<!-- ✅ ЛР6: інтеграція frontend + API (мінімально, не ламає сторінку) -->
+<h2 style="margin-top:20px;">🧪 Demo (Lab 6): список + додавання товару</h2>
+
+<div id="message" style="margin:10px 0;"></div>
+<div id="loading" style="display:none; margin:10px 0;">⏳ Завантаження...</div>
+
+<form id="addForm" style="max-width:500px;">
+    <label>Назва</label>
+    <input id="nazva" type="text" required>
+
+    <label>Опис</label>
+    <input id="opis" type="text">
+
+    <label>Ціна</label>
+    <input id="tsina" type="number" required>
+
+    <button type="submit" class="api-btn" style="margin-top:10px;">Додати товар (POST)</button>
+</form>
+
+<div id="dataList" style="margin-top:15px;"></div>
+
+<script>
+const API_URL = '/api/tovars';
+
+function showLoading(show) {
+  document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+
+function showMessage(text, type) {
+  const box = document.getElementById('message');
+  box.textContent = text;
+  box.style.color = (type === 'error') ? 'red' : 'green';
+  setTimeout(() => { box.textContent = ''; }, 4000);
+}
+
+async function loadTovars() {
+  try {
+    showLoading(true);
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    const list = document.getElementById('dataList');
+    list.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<p>Товарів поки немає.</p>';
+      return;
+    }
+
+    data.forEach(t => {
+      const div = document.createElement('div');
+      div.style.border = '1px solid #ddd';
+      div.style.padding = '10px';
+      div.style.marginBottom = '8px';
+      div.innerHTML = `
+        <b>${t.nazva ?? ''}</b><br>
+        <span>${t.opis ?? ''}</span><br>
+        <span>💰 ${t.tsina ?? ''}</span>
+      `;
+      list.appendChild(div);
+    });
+
+  } catch (e) {
+    showMessage('❌ Помилка завантаження: ' + e.message, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nazva = document.getElementById('nazva').value.trim();
+  const opis = document.getElementById('opis').value.trim();
+  const tsina = Number(document.getElementById('tsina').value);
+
+  if (nazva.length < 2) {
+    showMessage('❌ Назва має бути мінімум 2 символи', 'error');
+    return;
+  }
+
+  try {
+    showLoading(true);
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ nazva, opis, tsina })
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(()=>'');
+      throw new Error(`HTTP ${res.status} ${txt}`);
+    }
+
+    showMessage('✅ Товар додано!', 'success');
+    e.target.reset();
+    await loadTovars();
+  } catch (e) {
+    showMessage('❌ Помилка додавання: ' + e.message, 'error');
+  } finally {
+    showLoading(false);
+  }
+});
+
+window.addEventListener('load', loadTovars);
+</script>
+
 {% endblock %}
