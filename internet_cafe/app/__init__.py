@@ -1,11 +1,15 @@
 import os
+import sqlite3
+
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from sqlalchemy import text
+from sqlalchemy import text, event
+from sqlalchemy.engine import Engine
 
 db = SQLAlchemy()
+
 
 def create_app():
     app = Flask(__name__)
@@ -18,19 +22,57 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{database_path}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # ✅ Обмеження розміру upload (2MB)
+    app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+
     CORS(app)
 
     db.init_app(app)
     Migrate(app, db)
 
-    # ✅ ВАЖЛИВО: імпортуємо моделі, щоб SQLAlchemy “побачив” таблиці
+    # ✅ Вмикаємо foreign keys для SQLite (щоб CASCADE працював)
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        if isinstance(dbapi_connection, sqlite3.Connection):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON;")
+            cursor.close()
+
+    # ✅ Імпортуємо моделі
     from .models import Tovar, Feedback, Order  # noqa: F401
 
-    # ✅ Створюємо таблиці, якщо їх ще нема (для нової SQLite бази)
+    # ✅ Створюємо таблиці, якщо їх ще нема + авто-мікро-міграція для SQLite
     with app.app_context():
         db.create_all()
 
-    # Healthcheck endpoint (SQLAlchemy 2.x compatible)
+        # Друк шляху до реально використаної БД (дуже корисно при дебазі)
+        try:
+            print("✅ DB path:", database_path)
+        except Exception:
+            pass
+
+        # ✅ Додаємо колонку status, якщо база стара і в таблиці її нема
+        def _ensure_status_column(table_name: str) -> bool:
+            cols = db.session.execute(text(f'PRAGMA table_info("{table_name}");')).fetchall()
+            if not cols:
+                return False  # таблиці нема
+            col_names = {c[1] for c in cols}  # c[1] = назва колонки
+            if "status" not in col_names:
+                db.session.execute(
+                    text(f'ALTER TABLE "{table_name}" ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT "NEW";')
+                )
+                db.session.commit()
+            return True
+
+        try:
+            # пробуємо "order"
+            if not _ensure_status_column("order"):
+                # якщо таблиця називається orders
+                _ensure_status_column("orders")
+        except Exception:
+            # не валимо застосунок через міграцію
+            pass
+
     @app.get("/health")
     def health():
         try:

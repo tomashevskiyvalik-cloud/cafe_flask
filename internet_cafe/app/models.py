@@ -8,7 +8,7 @@ class Tovar(db.Model):
     opis = db.Column(db.Text, nullable=False)
     tsina = db.Column(db.Float, nullable=False)
 
-    # ✅ НОВЕ ПОЛЕ ДЛЯ ФОТО (назва файлу в static/uploads/tovary/)
+    # Фото (назва файлу в static/uploads/tovary/)
     image_filename = db.Column(db.String(255), nullable=True)
 
     def to_dict(self):
@@ -40,21 +40,33 @@ class Feedback(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    tovar_id = db.Column(db.Integer, db.ForeignKey('tovar.id'), nullable=False)
+
+    # ✅ ondelete для БД (працює з PRAGMA foreign_keys=ON)
+    tovar_id = db.Column(db.Integer, db.ForeignKey('tovar.id', ondelete="CASCADE"), nullable=False)
+
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     quantity = db.Column(db.Integer, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    tovar = db.relationship('Tovar', backref=db.backref('orders', lazy=True))
+    # ✅ НОВЕ: статус замовлення
+    status = db.Column(db.String(20), default="NEW", nullable=False)
+    # NEW / COOKING / DONE / CANCELED
+
+    # ✅ ORM каскад: при видаленні товару — видаляться замовлення
+    tovar = db.relationship(
+        'Tovar',
+        backref=db.backref('orders', lazy=True, cascade="all, delete-orphan")
+    )
 
     def to_dict(self):
         return {
             "id": self.id,
             "tovar_id": self.tovar_id,
-            "tovar_nazva": self.tovar.nazva,
+            "tovar_nazva": self.tovar.nazva if self.tovar else None,
             "quantity": self.quantity,
             "name": self.name,
             "phone": self.phone,
+            "status": self.status,
             "created_at": self.created_at.isoformat()
         }

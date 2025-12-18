@@ -14,15 +14,10 @@ ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp'}
 
 
 def _uploads_dir():
-    # internet_cafe/app/static/uploads/tovary
     return os.path.join(current_app.root_path, 'static', 'uploads', 'tovary')
 
 
 def _save_photo(file_storage):
-    """
-    Save uploaded image into static/uploads/tovary and return filename.
-    Returns None if no file provided.
-    """
     if not file_storage or not getattr(file_storage, "filename", ""):
         return None
 
@@ -45,7 +40,6 @@ def _delete_photo(filename):
         if os.path.exists(path):
             os.remove(path)
     except Exception:
-        # не ламаємо сайт, навіть якщо файл не видалився
         pass
 
 
@@ -87,7 +81,6 @@ def edit_tovar(id):
         tovar.opis = form.opis.data
         tovar.tsina = form.tsina.data
 
-        # якщо завантажили нове фото — заміняємо старе
         if form.photo.data and getattr(form.photo.data, "filename", ""):
             new_filename = _save_photo(form.photo.data)
             if new_filename:
@@ -105,7 +98,6 @@ def edit_tovar(id):
 def delete_tovar(id):
     tovar = Tovar.query.get_or_404(id)
 
-    # видаляємо фото з диска
     _delete_photo(tovar.image_filename)
 
     db.session.delete(tovar)
@@ -129,4 +121,21 @@ def delete_order(id):
     db.session.delete(order)
     db.session.commit()
     flash('Замовлення видалено!', 'info')
+    return redirect(url_for('admin.admin_index'))
+
+
+# ✅ НОВЕ: зміна статусу замовлення (фіча для “9”)
+@admin_bp.route('/order_status/<int:id>', methods=['POST'])
+def order_status(id):
+    order = Order.query.get_or_404(id)
+    new_status = request.form.get('status', 'NEW')
+
+    allowed = {'NEW', 'COOKING', 'DONE', 'CANCELED'}
+    if new_status not in allowed:
+        flash('Невірний статус', 'error')
+        return redirect(url_for('admin.admin_index'))
+
+    order.status = new_status
+    db.session.commit()
+    flash('Статус оновлено!', 'success')
     return redirect(url_for('admin.admin_index'))

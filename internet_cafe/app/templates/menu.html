@@ -3,6 +3,7 @@
 {% block title %}Меню - Кафе{% endblock %}
 
 {% block content %}
+
 <div class="menu-head">
   <div>
     <h1 class="menu-title">Меню</h1>
@@ -10,17 +11,39 @@
   </div>
 </div>
 
+<!-- 🔍 ПОШУК + СОРТУВАННЯ -->
+<form method="GET" class="menu-filters" style="display:flex; gap:12px; flex-wrap:wrap; margin:16px 0;">
+  <input
+    type="text"
+    name="q"
+    value="{{ q }}"
+    placeholder="Пошук по меню..."
+    style="padding:10px; min-width:220px;"
+  >
+
+  <select name="sort" style="padding:10px;">
+    <option value="new" {% if sort=='new' %}selected{% endif %}>Спочатку нові</option>
+    <option value="price_asc" {% if sort=='price_asc' %}selected{% endif %}>Ціна ↑</option>
+    <option value="price_desc" {% if sort=='price_desc' %}selected{% endif %}>Ціна ↓</option>
+    <option value="name" {% if sort=='name' %}selected{% endif %}>Назва A→Z</option>
+  </select>
+
+  <button type="submit" style="padding:10px 16px;">Застосувати</button>
+</form>
+
+<!-- 🍽️ МЕНЮ -->
 <div class="menu-grid">
   {% for tovar in tovary %}
-    {% set img = tovar|attr('image_filename') %}
     <div class="menu-card">
+
       <div class="menu-media">
-        {% if img %}
-          <img src="{{ url_for('static', filename='uploads/tovary/' ~ img) }}" alt="{{ tovar.nazva }}">
+        {% if tovar.image_filename %}
+          <img src="{{ url_for('static', filename='uploads/tovary/' ~ tovar.image_filename) }}"
+               alt="{{ tovar.nazva }}">
         {% else %}
-          <div class="menu-placeholder" aria-hidden="true">
-            <div class="ph-icon">☕</div>
-            <div class="ph-text">Фото немає</div>
+          <div class="menu-placeholder">
+            <div style="font-size:32px;">☕</div>
+            <div>Фото немає</div>
           </div>
         {% endif %}
       </div>
@@ -34,15 +57,33 @@
         <p class="menu-desc">{{ tovar.opis }}</p>
 
         <div class="menu-actions">
-          <a class="menu-btn" href="{{ url_for('main.order', tovar_id=tovar.id) }}">🛒 Замовити</a>
+          <a class="menu-btn" href="{{ url_for('main.order', tovar_id=tovar.id) }}">
+            🛒 Замовити
+          </a>
         </div>
       </div>
     </div>
   {% else %}
     <div class="menu-empty">
-      <div class="menu-empty__title">Меню поки що порожнє.</div>
-      <div class="menu-empty__text">Зайди в адмінку і додай перші страви ✨</div>
+      <h2>Меню поки що порожнє</h2>
+      <p>Зайди в адмінку та додай перші страви ✨</p>
     </div>
   {% endfor %}
 </div>
+
+<!-- 📄 ПАГІНАЦІЯ -->
+{% if pagination and pagination.pages > 1 %}
+<div class="pagination" style="margin:20px 0; display:flex; gap:12px; align-items:center;">
+  {% if pagination.has_prev %}
+    <a href="{{ url_for('main.menu', page=pagination.prev_num, q=q, sort=sort) }}">← Назад</a>
+  {% endif %}
+
+  <span>Сторінка {{ pagination.page }} / {{ pagination.pages }}</span>
+
+  {% if pagination.has_next %}
+    <a href="{{ url_for('main.menu', page=pagination.next_num, q=q, sort=sort) }}">Далі →</a>
+  {% endif %}
+</div>
+{% endif %}
+
 {% endblock %}
